@@ -128,7 +128,7 @@ download.file(url, destfile = "PA1.zip")
 unzip("PA1.zip")
 
 #now we have activity.csv. Lets see the content
-activity <- read.csv("activity.csv",sep=",")
+activity <- read.csv("activity.csv",sep=",",  na.strings="NA")
 head(activity)
 tail(activity)
 summary(activity)
@@ -137,19 +137,122 @@ str(activity)
 # I prefer to use dataframes so...
  database <- data.frame()
  database <- rbind(database, activity)
+ 
+ #now lets process the data : remove missing data and to date the dates
+ database$date <- as.Date(database$date)
+ database2 <- subset(database, !is.na(database$steps))
 
 ```
 
 ## What is mean total number of steps taken per day?
 
 
+```{r}
+daysum <- tapply(database2$steps, database2$date, sum, na.rm=TRUE, simplify=T)
+daysum <- daysum[!is.na(daysum)]
+
+hist(x=daysum,
+     col="purple",
+     breaks=25,
+     xlab="total steps ( day)" ,
+     ylab="Freq",
+     main="dist of daily steps ( without missing)")
+```
+
+Now calculate the mean and median of steps/day
+
+```{r}
+mean(daysum)
+
+median(daysum)
+```
+
 
 ## What is the average daily activity pattern?
+I would create a time series plot  of the 5 minutes interval (x) and the average number of steps(y)
 
+```{r}
+database3 <- tapply(database2$steps, database2$interval, mean, na.rm=TRUE, simplify=T)
+database4 <- data.frame(interval=as.integer(names(database3)), avg=database3)
+
+with(database4,
+     plot(interval,
+          avg,
+          type="l",
+          xlab="5 min intervals",
+          ylab="avg steps in the interval across all days"))
+```
+
+Which avg( 5 minutoes interval) contains the maximum number of steps?
+
+```{r}
+max_steps <- max(database4$avg)
+database4[database4$avg == max_steps, ]
+```
 
 
 ## Imputing missing values
+Now we need to calculate the total number of missing values in dataset
+```{r}
+sum(is.na(database$steps))
+```
 
+our database started with 2304 nulls ( NA's).
+
+we will include the mean in NA's
+```{r}
+df_impute <- database
+ndx <- is.na(df_impute$steps)
+int_avg <- tapply(database2$steps, database2$interval, mean, na.rm=TRUE, simplify=T)
+df_impute$steps[ndx] <- int_avg[as.character(df_impute$interval[ndx])]
+```
+now we will use the historgram of total steps /day and calculate the median total number of steps/day
+```{r}
+new_dailysum <- tapply(df_impute$steps, df_impute$date, sum, na.rm=TRUE, simplify=T)
+
+hist(x=new_dailysum,
+     col="purple",
+     breaks=25,
+     xlab="day steps",
+     ylab="freq",
+     main="The distribution of daily total (with missing data imputed)")
+```
+
+```{r}
+mean(new_dailysum)
+median(new_dailysum)
+```
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+We need to create two factor variables. One for weekend and other for weekday or whathever the word for this in english. 
+
+```{r}
+is_weekday <- function(d) {
+    wd <- weekdays(d)
+    ifelse (wd == "saturday" | wd == "sunday"| wd =="sat" | wd =='sun', "weekend", "weekday")
+}
+
+wx<- sapply(df_impute$date, is_weekday)
+df_impute$wk <- as.factor(wx)
+head(df_impute)
+
+
+
+```
+
+
+```{r}
+wk_df <- aggregate(steps ~ wk+interval, data=df_impute, FUN=mean)
+
+library(lattice)
+xyplot(steps ~ interval | factor(wk),
+       layout = c(1, 2),
+       xlab="Interval",
+       ylab="Number of steps",
+       type="l",
+       lty=1,
+           data=wk_df)
+```
+
