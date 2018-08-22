@@ -316,7 +316,14 @@ hist(x=new_dailysum,
 <p>We need to create two factor variables. One for weekend and other for weekday or whathever the word for this in english.</p>
 <pre class="r"><code>is_weekday &lt;- function(d) {
     wd &lt;- weekdays(d)
-    ifelse (wd == &quot;saturday&quot; | wd == &quot;sunday&quot;| wd ==&quot;sat&quot; | wd =='sun', &quot;weekend&quot;, &quot;weekday&quot;)
+    if(wd == &quot;Saturday&quot; | wd == &quot;Sunday&quot;){
+     wd &lt;-&quot;weekend&quot;;
+      
+    }else{
+      wd&lt;- &quot;weekday&quot;;
+      
+    }
+   # ifelse (wd == &quot;saturday&quot; | wd == &quot;sunday&quot;| wd ==&quot;sat&quot; | wd =='sun', &quot;weekend&quot;, &quot;weekday&quot;)
 }
 
 wx&lt;- sapply(df_impute$date, is_weekday)
