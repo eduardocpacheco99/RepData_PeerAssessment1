@@ -83,7 +83,9 @@ hist(x=daysum,
      main="dist of daily steps ( without missing)")
 ```
 
-![](PA1_Eduardo_Pacheco_files/figure-markdown_github/unnamed-chunk-3-1.png) ![Sample panel plot](figure/fig1.jpg) Now calculate the mean and median of steps/day
+![](PA1_Eduardo_Pacheco_files/figure-markdown_github/unnamed-chunk-3-1.png)
+
+Now calculate the mean and median of steps/day
 
 ``` r
 mean(daysum)
