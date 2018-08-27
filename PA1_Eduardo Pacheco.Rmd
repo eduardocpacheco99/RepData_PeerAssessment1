@@ -54,7 +54,7 @@ hist(x=daysum,
      ylab="Freq",
      main="dist of daily steps ( without missing)")
 ```
-
+![Sample panel plot](figure/fig1.jpg) 
 Now calculate the mean and median of steps/day
 
 ```{r}
