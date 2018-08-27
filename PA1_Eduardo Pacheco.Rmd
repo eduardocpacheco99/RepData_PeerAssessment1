@@ -3,7 +3,7 @@ title: "Reproducible Research: Peer Assessment 1"
 output: 
   md_document:
       variant: markdown_github
-date: "21 de agosto de 2018"
+date: "27 de agosto de 2018"
 keep_md: true
 author: "Eduardo Pacheco"
 
